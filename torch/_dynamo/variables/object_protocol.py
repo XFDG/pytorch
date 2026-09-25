@@ -1267,6 +1267,14 @@ def binary_op1(
     # "different VT subclasses sharing a python_type", so we drop the type
     # equality check.
     if v_slot is w_slot:
+        # UDOVs with inheritance may not have the same slot even when the if above is True:
+        #    class Derived(set):
+        #        ...
+        #    class Custom(set):
+        #        def __ror__(self, other):
+        #            return "reversed"
+        # Both Derived and Custom have the same slot but the former inherits it from set
+        # TODO(dynamo-team): This is a known bug in the codebase
         w_slot = None
 
     if v_slot is not None:
